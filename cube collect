@@ -1,0 +1,194 @@
+#include <kipr/wombat.h>
+
+// left wheel port = 3 
+// right wheel port = 0 
+
+//arm port = 
+//claw port = 
+
+int forward = 500;
+int backward = -500;
+    
+int left_wheel_turn_left = -500; 
+int right_wheel_turn_left = 500;      
+
+int left_wheel_turn_right = 500;   
+int right_wheel_turn_right = -500;      
+
+int claw_open = 400;
+int claw_close = 1400; 
+
+int main()
+    
+{
+    
+cmpc(0);
+cmpc(3);    
+    
+while (gmpc(0) < 1250)
+    
+{
+    
+mav(0, right_wheel_turn_left);			//turn left
+mav(3, left_wheel_turn_left); 
+   
+}    
+
+cmpc(0);
+cmpc(3);
+    
+while (gmpc(0) < 5000)
+    
+{    
+    
+mav(0,forward);							//forward
+mav(3,forward);
+
+} 
+    	
+cmpc(0);
+cmpc(3);        
+    
+enable_servos(3);    
+    
+set_servo_position(3,claw_close); 			//sets starting position with claw closed; will go at the very start of int main.
+msleep(10);    
+  
+msleep(500);    
+    
+camera_open();
+    
+msleep(500);   
+   
+camera_update();    
+    
+while (get_object_count(0) == 0)
+    
+{
+    
+mav(0,right_wheel_turn_right);
+mav(3,left_wheel_turn_right);								//looks right until sees cube
+msleep(69);
+    
+camera_update();    
+    
+}    
+  
+mav(0,0);
+mav(3,0);								//stops  
+msleep(500);     
+    
+camera_close();     
+    
+set_servo_position(3,claw_open); 			//opens claw
+msleep(10);    
+    
+mav(0,forward);
+mav(3,forward);								//moves forward
+msleep(10000); 
+    
+set_servo_position(3,claw_close); 			//claw closed
+msleep(10);    
+    
+mav(0,0);
+mav(3,0);								//stops  
+msleep(500);    
+    
+while (digital(0) == 0 || digital(1) == 0) 
+    
+    { 
+     
+mav(0,backward);
+mav(3,backward);								//moves backard until button pressed
+msleep(10);    
+        
+    }       
+    
+mav(1,500);									//arm up			
+msleep(24000);            
+    
+mav(0,forward);
+mav(3,forward);								//moves forward
+msleep(1000);
+      
+cmpc(0);
+cmpc(3);    
+    
+while (gmpc(0) > -900)
+    
+{
+    
+mav(0, right_wheel_turn_right);			//turn right
+mav(3, left_wheel_turn_right); 
+     
+}      
+  
+cmpc(0);
+cmpc(3);    
+    
+while (gmpc(0) < 2200)
+       
+{    
+    
+mav(0,forward);							//forward
+mav(3,forward);
+
+}     
+    
+while (gmpc(0) < 2500)
+    
+{
+    
+mav(0, right_wheel_turn_left);			//turn left
+mav(3, left_wheel_turn_left); 
+   
+}    
+    
+while (get_object_count(0) == 0)
+    
+{
+    
+mav(0,right_wheel_turn_right);
+mav(3,left_wheel_turn_right);								//looks right until sees cube
+msleep(69);
+    
+camera_update();    
+    
+}    
+    
+mav(0,0);
+mav(3,0);								//stops  
+msleep(1000);     
+    
+camera_close();         
+    
+mav(0,forward);
+mav(3,forward);								//moves forward
+msleep(10000); 
+    
+set_servo_position(3,claw_open); 			//claw opened
+msleep(10);    
+    
+mav(1,-500);									//arm down			
+msleep(24000);    
+    
+set_servo_position(3,claw_close); 			//claw opened
+msleep(10);    
+    
+mav(0,0);
+mav(3,0);								//stops  
+msleep(500);    
+    
+while (digital(0) == 0 || digital(1) == 0) 
+    
+    { 
+     
+mav(0,backward);
+mav(3,backward);								//moves backard until button pressed
+msleep(10);    
+        
+    }    
+    
+    
+    return 0;
+}
